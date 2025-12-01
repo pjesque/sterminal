@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Love Terminal</title>
+    <style>
+      :root {
+        --bg: #0b0f12;
+        --green: #9fffa9;
+        --dim: #6adf79;
+        --accent: #76f7ff;
+      }
+      html,
+      body {
+        height: 100%;
+        background: var(--bg);
+        margin: 0;
+      }
+      body {
+        font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
+          "Liberation Mono", monospace;
+        color: var(--green);
+      }
+
+      .wrap {
+        max-width: 800px;
+        margin: 40px auto;
+        padding: 24px;
+        background: #0a0e11;
+        border: 1px solid #1e2a2f;
+        box-shadow: 0 0 12px #031b09 inset, 0 0 16px #031b09;
+        position: relative;
+      }
+      /* CRT vibe */
+      .wrap::after {
+        content: "";
+        pointer-events: none;
+        position: absolute;
+        inset: 0;
+        background: repeating-linear-gradient(
+          transparent,
+          transparent 2px,
+          rgba(0, 0, 0, 0.15) 3px
+        );
+        mix-blend-mode: soft-light;
+      }
+      .title {
+        color: var(--accent);
+        margin-bottom: 12px;
+      }
+      .blink {
+        animation: blink 1s steps(2, start) infinite;
+      }
+      @keyframes blink {
+        50% {
+          opacity: 0;
+        }
+      }
+
+      .screen {
+        min-height: 50vh;
+        white-space: pre-wrap;
+        line-height: 1.5;
+      }
+      .prompt-line {
+        display: flex;
+        align-items: baseline;
+        gap: 8px;
+      }
+      .prompt {
+        color: var(--dim);
+      }
+      .input {
+        flex: 1;
+        background: transparent;
+        border: none;
+        color: var(--green);
+        outline: none;
+        caret-color: var(--accent);
+        font: inherit;
+      }
+      .hint {
+        color: #5aa36a;
+      }
+      .cmd {
+        color: var(--accent);
+      }
+      .tag {
+        color: #aabfb1;
+      }
+
+      .footer {
+        margin-top: 16px;
+        color: #4a8b58;
+        font-size: 12px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <div class="title">/home/pranjali ♥ Love Terminal v1.67</div>
+      <div id="screen" class="screen"></div>
+
+      <div class="prompt-line">
+        <div class="prompt">sanyam@heart:~$</div>
+        <input
+          id="input"
+          class="input"
+          autocomplete="off"
+          autofocus
+          placeholder="type 'help' to start"
+        />
+        <div class="blink">▊</div>
+      </div>
+
+      <div class="footer">
+        Tip 4 Cutie: try <span class="cmd">love --random</span>,
+        <span class="cmd">ascii --heart</span>, or
+        <span class="cmd">date --next</span>
+      </div>
+    </div>
+
+    <script>
+      const screen = document.getElementById("screen");
+      const input = document.getElementById("input");
+
+      const notes = [
+        "I love you!!!!! (I love you more. And even more than that. Heh. All combinations covered.)",
+        "Lemme lick your dawgs baby gworl :P",
+        "I'll be your biggest fan, forever and ever!!!!!",
+        "Miss ur armpits ji :(",
+        'If you get this note, you have to text me an "I love you" 🤣🫵',
+        "You're my nonchalant alpha ♥",
+        "Will you poop me off for the rest of my life? 💍",
+        "Proud of you always always alwaysssss!!!!!",
+        "You're more special to me than Steamed Chicken Momos.",
+      ];
+
+      const asciiHeart = `
+   *****     *****  
+  *******   ******* 
+ ********* *********
+ *******************
+  ***************** 
+   ***************  
+    ** I LOVE U **   
+     ************   
+      **********    
+       *********     
+        *******      
+         *****       
+          ***        
+           *         
+`;
+
+      function nextFirstOfMonth() {
+        const today = new Date();
+        let year = today.getFullYear();
+        let month = today.getMonth();
+
+        // if today is past the 1st, move to next month
+        if (today.getDate() > 1) {
+          month++;
+          if (month > 11) {
+            // wrap to January
+            month = 0;
+            year++;
+          }
+        }
+
+        return new Date(year, month, 1);
+      }
+
+      const startDate = new Date(2025, 10, 1);
+
+      function write(lines, opts = {}) {
+        const text = Array.isArray(lines) ? lines.join("\n") : String(lines);
+        const div = document.createElement("div");
+        div.textContent = text;
+        screen.appendChild(div);
+        screen.scrollTop = screen.scrollHeight;
+      }
+
+      function promptEcho(cmd) {
+        write(`sanyam@heart:~$ ${cmd}`);
+      }
+
+      function help() {
+        write(
+          [
+            "Available commands:",
+            "  help            - show this help",
+            "  love --random   - show a random love note",
+            "  ascii --heart   - print a heart",
+            "  bouquet         - print a bouquet of flowers",
+            "  date --next     - days until our next big day",
+            "  clear           - clear the screen",
+          ].join("\n")
+        );
+      }
+
+      function bouquet(args) {
+        const img = document.createElement("img");
+        img.src = "kittyflower.jpg";
+        img.alt = "kitty giving kitty flowers";
+        img.style.maxWidth = "200px";
+        img.style.display = "block";
+        img.style.margin = "8px 0";
+
+        screen.appendChild(img);
+        screen.scrollTop = screen.scrollHeight;
+      }
+
+      function love(args) {
+        if (args.includes("--random")) {
+          const n = notes[Math.floor(Math.random() * notes.length)];
+          write(n);
+        } else {
+          write("Usage: love --random");
+        }
+      }
+
+      function ascii(args) {
+        if (args.includes("--heart")) {
+          write(asciiHeart);
+        } else {
+          write("Usage: ascii --heart");
+        }
+      }
+
+      function daysUntil(date) {
+        const today = new Date();
+        const ms = date.setHours(0, 0, 0, 0) - today.setHours(0, 0, 0, 0);
+        const days = Math.ceil(ms / (1000 * 60 * 60 * 24));
+        return days;
+      }
+
+      function progressBar(current, total, length = 30) {
+        const ratio = current / total;
+        const filled = Math.round(ratio * length);
+        const empty = length - filled;
+        return (
+          "[" +
+          "█".repeat(filled) +
+          "░".repeat(empty) +
+          `] ${current}/${total} days`
+        );
+      }
+
+      function nextDate() {
+        const target = nextFirstOfMonth();
+        const d = daysUntil(target);
+
+        // months together
+        const today = new Date();
+        let monthsTogether =
+          (today.getFullYear() - startDate.getFullYear()) * 12 +
+          (today.getMonth() - startDate.getMonth());
+        if (today.getDate() >= 1) monthsTogether++;
+
+        const totalDays = new Date(
+          target.getFullYear(),
+          target.getMonth() + 1,
+          0
+        ).getDate();
+        const dayOfMonth = today.getDate();
+        const bar = progressBar(dayOfMonth, totalDays);
+
+        if (d > 0) {
+          write(`Countdown: ${d} day(s) until our next monthly anniversary ♥`);
+        } else if (d === 0) {
+          write("It's the 1st today! Happy monthly anniversary ♥");
+        }
+
+        write(bar);
+        write(
+          `We’ve been together for ${
+            monthsTogether - 1
+          } month(s) since Nov 1, 2025 ♥`
+        );
+      }
+
+      function clearScreen() {
+        screen.innerHTML = "";
+      }
+
+      function unknown(cmd) {
+        write(`Command not found: ${cmd}\nType 'help' for available commands.`);
+      }
+
+      function handle(cmd) {
+        promptEcho(cmd);
+        const [name, ...args] = cmd.trim().split(/\s+/);
+        switch (name) {
+          case "help":
+            help();
+            break;
+          case "love":
+            love(args);
+            break;
+          case "ascii":
+            ascii(args);
+            break;
+          case "bouquet":
+            bouquet(args);
+            break;
+          case "date":
+            if (args.includes("--next")) nextDate();
+            else write("Usage: date --next");
+            break;
+          case "clear":
+            clearScreen();
+            break;
+          case "":
+            break;
+          default:
+            unknown(name);
+        }
+      }
+
+      write(
+        [
+          "Booting Love Terminal…",
+          "Type 'help' to discover commands.",
+          "",
+        ].join("\n")
+      );
+
+      input.addEventListener("keydown", (e) => {
+        if (e.key === "Enter") {
+          handle(input.value);
+          input.value = "";
+        }
+      });
+    </script>
+  </body>
+</html>
